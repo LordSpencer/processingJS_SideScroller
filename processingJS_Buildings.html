@@ -1,0 +1,75 @@
+<html>
+	<head>
+		<title>FishTank 2.0</title>
+		<script src="http://cloud.github.com/downloads/processing-js/processing-js/processing-1.4.1.min.js"></script>
+		<script type="text/processing" data-processing-target="mycanvas">
+        // Declare and contruct two objects (h1, h2) from the class HorizontalLine 
+        
+        // Declare and contruct two objects (h1, h2) from the class 
+        
+        Building frontBuilding = new Building(670, random(470,600), 70, 130, 1.5);
+        Building middleBuilding = new Building(750, random(200,400), 150, 400, 1);
+
+        int WINDOW_WIDTH = 700;
+        int WINDOW_HEIGHT = 600;
+        
+        int REFRESH_RATE_PER_SECOND = 60;
+        int BLUE = color(32, 12, 207);
+
+        void setup(){
+
+          size(WINDOW_WIDTH, WINDOW_HEIGHT);
+        
+          frameRate(REFRESH_RATE_PER_SECOND);
+        }
+          
+        void draw() { 
+          background(BLUE);
+
+          frontBuilding.updateAndRedraw(); 
+          middleBuilding.updateAndRedraw();
+
+        }
+        class Building{ 
+          
+          //attributes
+          float xpos, ypos, speed, buildingW, buildingH; 
+        
+          //constructor 
+          Building(float x, float y, float bH, float bW, float s) 
+          { 
+            xpos = x;
+            ypos = y; 
+            speed = s;
+            buildingW = bW;
+            buildingH = bH;
+          } 
+          
+          void updateAndRedraw() {
+            update();
+            drawBuilding();
+          }
+          
+          void update(){ 
+            xpos = xpos - speed; 
+            if (xpos < 0){ 
+              xpos = 700; 
+            } 
+          } 
+          
+          void drawBuilding() {
+            fill(136, 0, 255);
+            rect(xpos, ypos, buildingH, buildingW);
+          }
+        
+        }
+        </script> 
+    </head>
+    
+    <body>
+		<canvas id="mycanvas"></canvas>
+	</body>
+</html>
+
+file:///Users/spencerhurst/Downloads/processingLecture.html
+    
