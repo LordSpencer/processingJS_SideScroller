@@ -9,15 +9,15 @@
 		Skyline forwardSkyline = new Skyline(150, -3);
 		Skyline middleSkyline = new Skyline(300, -2);
 		Moon newMoon = new Moon(800, 100, 1);
-		Mario readyMario = new Mario(0,0);
-		Coin newCoin = new Coin(500);
-		CoinCreator newCoinCreator = new CoinCreator();
+		Mario readyMario = new Mario(30,0);
+		Coin newCoin = new Coin(500, random(40, 300));
+		CoinCreator newCoinCreator = new CoinCreator(-5);
         //since these are variables we don't want to ever change in the code, we capitalize them
         var WINDOW_WIDTH = screen.width;
         var WINDOW_HEIGHT = 400;
         var GREY = 204;
 				var UP_ARROW = 38;
-
+				var Score = 0;
 
         //This function only runs once at the start of the program
         void setup() {
@@ -38,7 +38,26 @@
 				forwardSkyline.moveSkyline();
 				readyMario.updateAndDrawMario();
 				newCoin.drawAndUpdateCoin();
-				newCoinCreator.update();
+				newCoinCreator.moveCoins();
+				//println(newCoinCreator.getCoinCX());
+				//println(readyMario.getMarioX());
+				//if(newCoin.getCoinX() == -100){
+					//newCoin.setCoin(500, 50);
+				//}
+				if((newCoin.getCoinX() >= readyMario.getMarioX() && newCoin.getCoinX() <= (readyMario.getMarioX() + 40)) && (newCoin.getCoinY() >= readyMario.getMarioY()) && newCoin.getCoinY() <= readyMario.getMarioY() + 40){
+				 	newCoin.setCoin(500, 50);
+				 	println("inside CheckFunction");
+					Score++;
+				}
+				// if((newCoinCreator.getCoinX() >= readyMario.getMarioX() && newCoinCreator.getCoinX() <= (readyMario.getMarioX() + 40)) && (newCoinCreator.getCoinY() >= readyMario.getMarioY()) && newCoinCreator.getCoinY() <= readyMario.getMarioY() + 40){
+				//  	newCoin.setCoin(500, 50);
+				//  	println("inside CheckFunction");
+				//		Score++;
+				// }
+
+				textSize(18);
+				fill(78, 109, 230);
+				text("Score: " + Score, 20, 30);
 
 				//middleSkyline.drawSkyline();
         }
@@ -54,7 +73,6 @@
 						marioX = mX;
 						marioY = mY;
 						img = loadImage("mario_jump.jpg");
-						coins = 0;
 					}
 
 					void updateAndDrawMario(){
@@ -69,7 +87,6 @@
 						else {
 							fall();
 						}
-
 					}
 
 					void drawMario(){
@@ -89,34 +106,46 @@
 							img = loadImage("mario.jpg");
 						}
 					}
+					int getMarioX(){
+						return marioX;
+					}
+					int getMarioY(){
+						return marioY;
+					}
 				}
 				/* @pjs preload="Retro-Coin-icon.png"; */
 				class Coin {
 					var coinX, coinY, speed;
 					PImage img;
-					Coin(var cX){
+					Coin(var cX, cY){
 						coinX = cX;
-						coinY = random(40, 300);
+						coinY = cY;
 						speed = -5;
 						img = loadImage("Retro-Coin-icon.png");
 					}
 					void drawAndUpdateCoin(){
+						var testCoinSpeed = -5;
 						drawCoin();
-						updateCoin();
+						updateCoin(testCoinSpeed);
 					}
 					void drawCoin(){
 						image(img, coinX, coinY, 32, 32);
 					}
-					void updateCoin(){
+					void updateCoin(var speed){
 					 	coinX += speed;
 					}
 					int getCoinX(){
 						return coinX;
+						println("inside getCoinX");
+					}
+					int getCoinY(){
+						return coinY;
+					}
+					void setCoin(var newX, var newY){
+						coinX = newX;
+						coinY = newY;
 					}
 				}
-
-
-
 
         class Building {
         	var xPosition, buildingY, buildingHeight, buildingWidth;
@@ -151,12 +180,13 @@
 
 				class CoinCreator{
 					ArrayList<Coin> coinlist;
-					var coinSpeed, coinX;
-					CoinCreator(){
+					var coinSpeed, coinX, totalCoinX;
+					CoinCreator(var cS){
 						coinList = new ArrayList<Coin>();
-						coinX = 700;
-						coinSpeed = -5;
-						//fillSkyCoin();
+						coinX = 0;
+						coinSpeed = cS;
+						totalCoinX = 0;
+						fillSkyCoin();
 					}
 					void moveCoins(){
 						drawCoinCreator();
@@ -171,28 +201,39 @@
 					void update(){
 						for(var i = 0; i < coinList.size(); i++) {
 						Coin currentCoin = coinList.get(i);
-						currentCoin.update(currentSpeed);
+						currentCoin.updateCoin(coinSpeed);
 						//println(buildingList.size);
 						if(currentCoin.getCoinX() < -100){
 							coinList.remove(i);
 							addCoin();
 							i--;//makes sure we check the adjacent building to the building we just deleted
 						}
+						if((currentCoin.getCoinX() >= readyMario.getMarioX() && currentCoin.getCoinX() <= (readyMario.getMarioX() + 40)) && (currentCoin.getCoinY() >= readyMario.getMarioY()) && currentCoin.getCoinY() <= readyMario.getMarioY() + 40){
+						  	currentCoin.setCoin(0, -100);
+						  	println("inside CheckFunction");
+								Score++;
+						}
 					}
-						coinX += coinSpeed;
+					coinX += coinSpeed;
 				}
 				void addCoin(){
+					var coinY = random(40, 300);
+					var coinSpace = 150;
+					totalCoinX = totalCoinX + coinSpace;
 					Coin currentCoin = new Coin(coinX, coinY);
 					coinList.add(currentCoin);
-					coinX += 70;
+					coinX += coinSpace;
+
 					}
+
 					void fillSkyCoin(){
 						//TODO:add enough buildings to fill the screen
 						//total BW was moved
-						while(totalBW - 300 <=screen.width){
+						while(totalCoinX - 300 <=screen.width){
 							addCoin();
 						}
 					}
+
 				}
 
 		class Skyline {
